@@ -1,0 +1,1 @@
+WARNING 2025-09-18 07:09:52,853 security_middleware 74119 140704315424192 SECURITY_EVENT: {"timestamp": "2025-09-18T07:09:52.853434+00:00", "event_type": "ANOMALY_DETECTED", "data": {"ip": "127.0.0.1", "path": "/admin/", "user_agent": "", "detection_type": "suspicious_pattern"}}

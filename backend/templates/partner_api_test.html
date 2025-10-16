@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>パートナーAPI テスト</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .api-section {
+            margin-bottom: 30px;
+        }
+        .credentials {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-left: 4px solid #2196F3;
+            margin-bottom: 20px;
+        }
+        .credentials code {
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #1976D2;
+        }
+        .response {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .totp-generator {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .totp-code {
+            font-size: 18px;
+            font-weight: bold;
+            color: #856404;
+            margin-left: 10px;
+        }
+        .header-info {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .file-upload {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .file-upload.dragover {
+            border-color: #2196F3;
+            background-color: #f0f8ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>パートナーAPI テストツール</h1>
+        
+        <div class="credentials">
+            <h3>認証情報</h3>
+            <p><strong>Access Key:</strong> <code>5nzev4id7ooof4cq8vgzv1zbas2wyvn7tbr4n8uh</code></p>
+            <p><strong>Shared Secret:</strong> <code>G3ZGZNLNRNXUSJHMXYYTVEIOLDE7HMAM</code></p>
+            <div class="totp-generator">
+                <strong>TOTP Token:</strong> <span class="totp-code" id="totpCode">359623</span>
+                <button onclick="generateTOTP()">更新</button>
+                <small style="display: block; margin-top: 5px; color: #666;">
+                    手動入力: <input type="text" id="manualTotp" value="359623" style="width: 100px; font-size: 14px;">
+                    <button onclick="useManualTOTP()">使用</button>
+                    <br>
+                    <span id="totpStatus" style="color: green;">✓ 有効</span>
+                    <span id="totpCountdown" style="margin-left: 10px;"></span>
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="api-section">
+            <h2>1. 交換先一覧取得</h2>
+            <button onclick="testBrands()">ブランド一覧を取得</button>
+            <div id="brandsResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="api-section">
+            <h2>2. 購入ID作成</h2>
+            <div class="form-group">
+                <label>価格リスト (カンマ区切り)</label>
+                <input type="text" id="prices" value="1000,3000,5000" placeholder="例: 1000,3000,5000">
+            </div>
+            <div class="form-group">
+                <label>ギフト名</label>
+                <input type="text" id="giftName" value="テストキャンペーン">
+            </div>
+            <div class="form-group">
+                <label>送付者名</label>
+                <input type="text" id="issuer" value="株式会社テスト">
+            </div>
+            <div class="form-group">
+                <label>ブランド (カンマ区切り)</label>
+                <input type="text" id="brands" value="amazon,paypay" placeholder="例: amazon,paypay">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="isStrict" checked> 厳密モード
+                </label>
+            </div>
+            <button onclick="createPurchaseId()">購入ID作成</button>
+            <div id="purchaseIdResponse" class="response" style="display: none;"></div>
+            <div id="currentPurchaseId" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="api-section">
+            <h2>3. 購入ID詳細取得</h2>
+            <div class="form-group">
+                <label>購入ID</label>
+                <input type="text" id="purchaseIdDetail" placeholder="購入IDを入力">
+            </div>
+            <button onclick="getPurchaseIdDetail()">詳細取得</button>
+            <div id="purchaseDetailResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="api-section">
+            <h2>4. 配色設定</h2>
+            <div class="form-group">
+                <label>購入ID</label>
+                <input type="text" id="colorPurchaseId" placeholder="購入IDを入力">
+            </div>
+            <div class="form-group">
+                <label>メイン色 (HEX)</label>
+                <input type="color" id="mainColor" value="#b3d4fc" onchange="updateColorInput(this, 'mainColorText')">
+                <input type="text" id="mainColorText" value="b3d4fc" style="margin-top: 5px;">
+            </div>
+            <div class="form-group">
+                <label>サブ色 (HEX)</label>
+                <input type="color" id="subColor" value="#4e77a6" onchange="updateColorInput(this, 'subColorText')">
+                <input type="text" id="subColorText" value="4e77a6" style="margin-top: 5px;">
+            </div>
+            <button onclick="setColor()">配色設定</button>
+            <div id="colorResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="api-section">
+            <h2>5. 動画設定</h2>
+            <div class="form-group">
+                <label>購入ID</label>
+                <input type="text" id="videoPurchaseId" placeholder="購入IDを入力">
+            </div>
+            <div class="form-group">
+                <label>YouTube URL</label>
+                <input type="text" id="videoUrl" value="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+            </div>
+            <div class="form-group">
+                <label>最低視聴時間（秒）</label>
+                <input type="number" id="playTime" value="10" min="0">
+            </div>
+            <button onclick="setVideo()">動画設定</button>
+            <div id="videoResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="api-section">
+            <h2>6. ギフト購入</h2>
+            <div class="form-group">
+                <label>購入ID</label>
+                <input type="text" id="giftPurchaseId" placeholder="購入IDを入力">
+            </div>
+            <div class="form-group">
+                <label>価格</label>
+                <input type="number" id="giftPrice" value="1000" min="1">
+            </div>
+            <button onclick="purchaseGift()">ギフト購入</button>
+            <div id="giftPurchaseResponse" class="response" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const ACCESS_KEY = '5nzev4id7ooof4cq8vgzv1zbas2wyvn7tbr4n8uh';
+        const SHARED_SECRET = 'G3ZGZNLNRNXUSJHMXYYTVEIOLDE7HMAM';
+        const BASE_URL = '/api/partner';
+        
+        let currentPurchaseId = null;
+
+        // TOTP生成関数（簡易実装）
+        function generateTOTP() {
+            // サーバーから最新のTOTPを取得
+            fetch('/api/get-totp/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.totp) {
+                        document.getElementById('totpCode').textContent = data.totp;
+                        document.getElementById('manualTotp').value = data.totp;
+                        console.log('TOTP updated:', data.totp);
+                    } else {
+                        // フォールバック: 簡易計算
+                        const now = Math.floor(Date.now() / 1000);
+                        const timeStep = Math.floor(now / 30);
+                        const mockTOTP = String(timeStep).slice(-6).padStart(6, '0');
+                        document.getElementById('totpCode').textContent = mockTOTP;
+                        document.getElementById('manualTotp').value = mockTOTP;
+                    }
+                })
+                .catch(error => {
+                    console.error('TOTP generation error:', error);
+                    const fallbackTOTP = '359623';
+                    document.getElementById('totpCode').textContent = fallbackTOTP;
+                    document.getElementById('manualTotp').value = fallbackTOTP;
+                });
+        }
+
+        function generateRequestId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function getBaseHeaders() {
+            return {
+                'x-realpay-gift-api-access-key': ACCESS_KEY,
+                'x-realpay-gift-api-access-token': document.getElementById('totpCode').textContent,
+                'Content-Type': 'application/json'
+            };
+        }
+
+        function getHeadersWithRequestId() {
+            const headers = getBaseHeaders();
+            headers['x-realpay-gift-api-request-id'] = generateRequestId();
+            return headers;
+        }
+
+        function displayResponse(elementId, response, isSuccess) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `response ${isSuccess ? 'success' : 'error'}`;
+            element.textContent = JSON.stringify(response, null, 2);
+        }
+
+        function updateColorInput(colorInput, textInputId) {
+            const hex = colorInput.value.substring(1);
+            document.getElementById(textInputId).value = hex;
+        }
+
+        function useManualTOTP() {
+            const manualTotp = document.getElementById('manualTotp').value;
+            if (manualTotp && manualTotp.length === 6) {
+                document.getElementById('totpCode').textContent = manualTotp;
+                console.log('Manual TOTP set:', manualTotp);
+            } else {
+                alert('6桁のTOTPトークンを入力してください');
+            }
+        }
+
+        async function testBrands() {
+            try {
+                const response = await fetch(`${BASE_URL}/brands/`, {
+                    headers: getBaseHeaders()
+                });
+                const data = await response.json();
+                displayResponse('brandsResponse', data, response.ok);
+            } catch (error) {
+                displayResponse('brandsResponse', {error: error.message}, false);
+            }
+        }
+
+        async function createPurchaseId() {
+            try {
+                const prices = document.getElementById('prices').value.split(',').map(p => parseInt(p.trim()));
+                const name = document.getElementById('giftName').value;
+                const issuer = document.getElementById('issuer').value;
+                const brands = document.getElementById('brands').value.split(',').map(b => b.trim());
+                const isStrict = document.getElementById('isStrict').checked;
+
+                const response = await fetch(`${BASE_URL}/purchases/`, {
+                    method: 'POST',
+                    headers: getHeadersWithRequestId(),
+                    body: JSON.stringify({
+                        prices: prices,
+                        name: name,
+                        issuer: issuer,
+                        brands: brands,
+                        is_strict: isStrict
+                    })
+                });
+
+                const data = await response.json();
+                displayResponse('purchaseIdResponse', data, response.ok);
+
+                if (response.ok && data.purchase) {
+                    currentPurchaseId = data.purchase.id;
+                    document.getElementById('currentPurchaseId').textContent = `現在の購入ID: ${currentPurchaseId}`;
+                    document.getElementById('currentPurchaseId').style.display = 'block';
+                    
+                    // 他のフィールドに自動入力
+                    document.getElementById('purchaseIdDetail').value = currentPurchaseId;
+                    document.getElementById('colorPurchaseId').value = currentPurchaseId;
+                    document.getElementById('videoPurchaseId').value = currentPurchaseId;
+                    document.getElementById('giftPurchaseId').value = currentPurchaseId;
+                }
+            } catch (error) {
+                displayResponse('purchaseIdResponse', {error: error.message}, false);
+            }
+        }
+
+        async function getPurchaseIdDetail() {
+            try {
+                const purchaseId = document.getElementById('purchaseIdDetail').value;
+                if (!purchaseId) {
+                    alert('購入IDを入力してください');
+                    return;
+                }
+
+                const response = await fetch(`${BASE_URL}/purchases/${purchaseId}/`, {
+                    headers: getBaseHeaders()
+                });
+
+                const data = await response.json();
+                displayResponse('purchaseDetailResponse', data, response.ok);
+            } catch (error) {
+                displayResponse('purchaseDetailResponse', {error: error.message}, false);
+            }
+        }
+
+        async function setColor() {
+            try {
+                const purchaseId = document.getElementById('colorPurchaseId').value;
+                const mainColor = document.getElementById('mainColorText').value;
+                const subColor = document.getElementById('subColorText').value;
+
+                if (!purchaseId) {
+                    alert('購入IDを入力してください');
+                    return;
+                }
+
+                const response = await fetch(`${BASE_URL}/purchases/${purchaseId}/color/`, {
+                    method: 'POST',
+                    headers: getHeadersWithRequestId(),
+                    body: JSON.stringify({
+                        main: mainColor,
+                        sub: subColor
+                    })
+                });
+
+                const data = await response.json();
+                displayResponse('colorResponse', data, response.ok);
+            } catch (error) {
+                displayResponse('colorResponse', {error: error.message}, false);
+            }
+        }
+
+        async function setVideo() {
+            try {
+                const purchaseId = document.getElementById('videoPurchaseId').value;
+                const videoUrl = document.getElementById('videoUrl').value;
+                const playTime = parseInt(document.getElementById('playTime').value);
+
+                if (!purchaseId) {
+                    alert('購入IDを入力してください');
+                    return;
+                }
+
+                const response = await fetch(`${BASE_URL}/purchases/${purchaseId}/video/`, {
+                    method: 'POST',
+                    headers: getHeadersWithRequestId(),
+                    body: JSON.stringify({
+                        url: videoUrl,
+                        play_time: playTime
+                    })
+                });
+
+                const data = await response.json();
+                displayResponse('videoResponse', data, response.ok);
+            } catch (error) {
+                displayResponse('videoResponse', {error: error.message}, false);
+            }
+        }
+
+        async function purchaseGift() {
+            try {
+                const purchaseId = document.getElementById('giftPurchaseId').value;
+                const price = parseInt(document.getElementById('giftPrice').value);
+
+                if (!purchaseId) {
+                    alert('購入IDを入力してください');
+                    return;
+                }
+
+                const response = await fetch(`${BASE_URL}/purchases/${purchaseId}/gifts/`, {
+                    method: 'POST',
+                    headers: getHeadersWithRequestId(),
+                    body: JSON.stringify({
+                        price: price
+                    })
+                });
+
+                const data = await response.json();
+                displayResponse('giftPurchaseResponse', data, response.ok);
+            } catch (error) {
+                displayResponse('giftPurchaseResponse', {error: error.message}, false);
+            }
+        }
+
+        // カウントダウン機能
+        function updateCountdown() {
+            const now = Math.floor(Date.now() / 1000);
+            const timeStep = now % 30;
+            const remaining = 30 - timeStep;
+            
+            document.getElementById('totpCountdown').textContent = `残り ${remaining}秒`;
+            
+            if (remaining <= 5) {
+                document.getElementById('totpStatus').innerHTML = '⚠️ 間もなく更新';
+                document.getElementById('totpStatus').style.color = 'orange';
+            } else {
+                document.getElementById('totpStatus').innerHTML = '✓ 有効';
+                document.getElementById('totpStatus').style.color = 'green';
+            }
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            generateTOTP();
+            updateCountdown();
+            // 30秒ごとにTOTPを更新
+            setInterval(generateTOTP, 30000);
+            // 1秒ごとにカウントダウンを更新
+            setInterval(updateCountdown, 1000);
+        });
+    </script>
+</body>
+</html>

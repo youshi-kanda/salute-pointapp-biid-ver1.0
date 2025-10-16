@@ -1,0 +1,28 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block content %}
+<!-- 本番管理画面へのリンク -->
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; margin: 20px 0; color: white;">
+    <h2 style="color: white; margin: 0 0 10px 0;">
+        🚀 本番運営ダッシュボード
+    </h2>
+    <p style="margin: 0 0 15px 0; opacity: 0.9;">
+        リアルタイム統計・システム設定・セキュリティ監視・統合管理機能
+    </p>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="/production-admin/" style="background: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+            📊 メインダッシュボード
+        </a>
+        <a href="/production-admin/settings/" style="background: #17a2b8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+            ⚙️ システム設定
+        </a>
+        <a href="/production-admin/api/status/" style="background: #ffc107; color: #333; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+            🔍 システム状態
+        </a>
+    </div>
+</div>
+
+<!-- 既存のDjango Admin内容 -->
+{{ block.super }}
+{% endblock %}

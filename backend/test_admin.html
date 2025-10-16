@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BIID Point App 運営管理画面 テスト</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .panel { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+        h1 { color: #333; }
+        h2 { color: #666; }
+        .url { font-family: monospace; background-color: #f8f9fa; padding: 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🎛️ BIID Point App 各画面アクセス確認</h1>
+    
+    <div class="panel success">
+        <h2>✅ サーバー起動状況</h2>
+        <p><strong>Django開発サーバー:</strong> http://localhost:8000/ で正常稼働中</p>
+        <p><strong>管理者アカウント:</strong> admin / password123 で作成済み</p>
+    </div>
+
+    <div class="panel info">
+        <h2>1️⃣ 運営管理画面（Django Admin）</h2>
+        <p><strong>URL:</strong> <span class="url">http://localhost:8000/admin/</span></p>
+        <p><strong>機能:</strong> 全46モデルの包括管理・セキュリティ監視・売上分析</p>
+        <p><strong>ログイン:</strong> admin / password123</p>
+        <p><strong>ブラウザでアクセス:</strong> Django標準の管理画面にカスタム機能を実装</p>
+    </div>
+
+    <div class="panel info">
+        <h2>2️⃣ 店舗管理画面</h2>
+        <p><strong>URL:</strong> <span class="url">http://localhost:8000/business/</span></p>
+        <p><strong>機能:</strong> 店舗売上管理・決済履歴・ポイント設定</p>
+        <p><strong>認証:</strong> 店舗管理者ロールが必要</p>
+    </div>
+
+    <div class="panel info">
+        <h2>3️⃣ ユーザー画面（フロントエンド）</h2>
+        <p><strong>URL:</strong> <span class="url">http://localhost:8000/api/user/</span> (API)</p>
+        <p><strong>機能:</strong> ポイント確認・ギフト交換・履歴表示</p>
+        <p><strong>実装:</strong> REST API + フロントエンド（別途実装）</p>
+    </div>
+
+    <div class="panel info">
+        <h2>4️⃣ 店舗用決済画面（ターミナル）</h2>
+        <p><strong>URL:</strong> <span class="url">http://localhost:8000/api/payment/</span> (API)</p>
+        <p><strong>機能:</strong> FINCODE決済・ポイント付与・レシート発行</p>
+        <p><strong>認証:</strong> APIキー認証が必要</p>
+    </div>
+
+    <h2>🔧 動作確認手順</h2>
+    <ol>
+        <li><strong>運営管理画面:</strong> ブラウザで http://localhost:8000/admin/ にアクセス</li>
+        <li><strong>ログイン:</strong> admin / password123 でログイン</li>
+        <li><strong>各モデル確認:</strong> Users, Stores, Payments, Digital gifts 等を確認</li>
+        <li><strong>API動作確認:</strong> curlまたはPostmanで各APIエンドポイントをテスト</li>
+    </ol>
+
+    <script>
+        // 自動でadmin画面を開く
+        setTimeout(function() {
+            window.open('http://localhost:8000/admin/', '_blank');
+        }, 2000);
+    </script>
+</body>
+</html>

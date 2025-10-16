@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BIID Point App - サーバー起動ガイド</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .solution { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .code { background-color: #f8f9fa; border: 1px solid #e9ecef; padding: 10px; font-family: monospace; border-radius: 3px; }
+        h1 { color: #dc3545; }
+        h2 { color: #28a745; }
+    </style>
+</head>
+<body>
+    <h1>🚨 BIID Point App サーバー起動エラー</h1>
+    
+    <div class="error">
+        <h2>❌ 発見された問題</h2>
+        <ul>
+            <li><strong>ミドルウェア競合:</strong> 複数のセキュリティミドルウェアが競合している</li>
+            <li><strong>ポート競合:</strong> 複数のDjangoプロセスが同時実行されている</li>
+            <li><strong>本番設定:</strong> DEBUG=Falseで開発サーバーが正常に動作しない</li>
+        </ul>
+    </div>
+
+    <div class="solution">
+        <h2>✅ 解決手順</h2>
+        
+        <h3>1. 全てのDjangoプロセスを停止</h3>
+        <div class="code">pkill -f "python manage.py runserver"</div>
+        
+        <h3>2. 開発用設定でサーバー起動</h3>
+        <div class="code">python manage.py runserver --settings=test_settings 127.0.0.1:8080</div>
+        
+        <h3>3. ブラウザでアクセス</h3>
+        <div class="code">http://127.0.0.1:8080/admin/</div>
+        
+        <h3>4. ログイン情報</h3>
+        <div class="code">
+            ユーザー名: admin<br>
+            パスワード: password123
+        </div>
+    </div>
+
+    <div class="solution">
+        <h2>🎛️ 管理画面で確認できる機能</h2>
+        <ul>
+            <li><strong>ユーザー管理:</strong> 全46モデルの包括管理</li>
+            <li><strong>決済管理:</strong> FINCODE連携・取引履歴</li>
+            <li><strong>ギフト管理:</strong> デジタルギフト・交換履歴</li>
+            <li><strong>店舗管理:</strong> 店舗設定・売上分析</li>
+            <li><strong>セキュリティ:</strong> ログ監視・不正検知</li>
+        </ul>
+    </div>
+
+    <div class="error">
+        <h2>🔧 本番環境での注意点</h2>
+        <ul>
+            <li>現在のセキュリティ設定は本番環境用です</li>
+            <li>開発中はtest_settings.pyを使用してください</li>
+            <li>本番配置時は元のsettings.pyを使用してください</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🎛️ BIID Point App - 管理画面アクセス情報</title>
+    <meta charset="utf-8">
+    <style>
+        body { 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            margin: 30px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            color: #2c3e50;
+        }
+        .access-box { 
+            background: #f8f9fa; 
+            border: 2px solid #28a745; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin: 15px 0; 
+        }
+        .access-box.warning {
+            border-color: #ffc107;
+            background: #fff8e1;
+        }
+        .url { 
+            font-family: 'Monaco', 'Consolas', monospace; 
+            background: #2c3e50; 
+            color: #ecf0f1; 
+            padding: 10px; 
+            border-radius: 5px; 
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .credentials {
+            background: #e8f5e8;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+        }
+        .feature-list {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .auto-open {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎛️ BIID Point App</h1>
+            <h2>運営管理画面 - アクセス情報</h2>
+        </div>
+
+        <div class="access-box">
+            <h3>✅ サーバー稼働中 <span class="status online">ONLINE</span></h3>
+            <div class="url">http://127.0.0.1:8080/admin/</div>
+            
+            <div class="credentials">
+                <h4>🔑 ログイン情報</h4>
+                <p><strong>ユーザー名:</strong> admin</p>
+                <p><strong>パスワード:</strong> password123</p>
+            </div>
+        </div>
+
+        <div class="access-box warning">
+            <h3>⚡ システム設定画面（新機能）</h3>
+            <div class="url">http://127.0.0.1:8080/admin/settings/</div>
+            <p><small>※ 現在実装中 - 基本機能はDjango Admin内で利用可能</small></p>
+        </div>
+
+        <div class="feature-list">
+            <h3>🎯 確認可能な管理機能</h3>
+            <ul>
+                <li><strong>👥 ユーザー管理:</strong> 全46モデルの包括管理</li>
+                <li><strong>🏪 店舗管理:</strong> 店舗設定・売上分析・設定管理</li>
+                <li><strong>💳 決済管理:</strong> FINCODE連携・取引履歴・レシート</li>
+                <li><strong>🎁 ギフト管理:</strong> デジタルギフト・交換履歴・ブランド管理</li>
+                <li><strong>🛡️ セキュリティ:</strong> ログ監視・不正検知・アクセス制限</li>
+                <li><strong>📊 レポート:</strong> 統計分析・売上レポート</li>
+            </ul>
+        </div>
+
+        <div class="auto-open">
+            <h4>🚀 自動ブラウザオープン</h4>
+            <p>5秒後に自動で管理画面を開きます...</p>
+            <button onclick="openAdmin()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                今すぐ開く
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function openAdmin() {
+            window.open('http://127.0.0.1:8080/admin/', '_blank');
+        }
+        
+        // 5秒後に自動で開く
+        setTimeout(openAdmin, 5000);
+        
+        // サーバー状態チェック
+        async function checkServer() {
+            try {
+                const response = await fetch('http://127.0.0.1:8080/admin/', {method: 'HEAD'});
+                if (response.ok) {
+                    document.querySelector('.status').textContent = 'ONLINE';
+                    document.querySelector('.status').className = 'status online';
+                }
+            } catch (e) {
+                document.querySelector('.status').textContent = 'OFFLINE';
+                document.querySelector('.status').className = 'status offline';
+            }
+        }
+        
+        checkServer();
+        setInterval(checkServer, 30000); // 30秒ごとにチェック
+    </script>
+</body>
+</html>
