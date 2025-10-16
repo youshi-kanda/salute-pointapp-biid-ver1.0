@@ -1,0 +1,13 @@
+# Default redirect to admin login
+/ /admin/login 302
+/index.html /admin/login 302
+
+# SPA fallback for admin routes
+/admin/* /admin/index.html 200
+/auth/* /auth/password-reset/index.html 200
+
+# Login redirect
+/login /admin/login 302
+
+# 404 only for unmatched page routes (not static assets)
+!/admin/* !/auth/* !/login/* !/_next/* !/favicon.ico /* /404.html 404
